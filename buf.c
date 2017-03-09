@@ -79,9 +79,8 @@ void  INThandler(int sig)
      printf("\nCan't leave till you figure out how.\nIn two lines, tell me how you feel about this. Then the shell will continue.\n");
      scanf("%s", entry);
 
-     int overflow[4];
-     overflow[0] = 0;
-     if (overflow[0] != 0) {
+     int overflow;
+     if (overflow == 49) {
         printf("I guess you can leave...\n");
         exit(0);
      } else {
