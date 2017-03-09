@@ -4,6 +4,8 @@
 #include <string.h>
 #include <signal.h>
 #include <ctype.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #define MAX_LINE 80 /* The maximum length of a command */
 #define BUFFER_SIZE 50 //max buffer size
@@ -77,8 +79,9 @@ void  INThandler(int sig)
      printf("\nCan't leave till you figure out how.\nIn two lines, tell me how you feel about this. Then the shell will continue.\n");
      scanf("%s", entry);
 
-     int overflow = 0;
-     if (overflow) {
+     int overflow[4];
+     overflow[0] = 0;
+     if (overflow[0] != 0) {
         printf("I guess you can leave...\n");
         exit(0);
      } else {
