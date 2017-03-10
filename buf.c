@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <time.h>
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
@@ -11,10 +12,21 @@
 #define BUFFER_SIZE 50 //max buffer size
 void INThandler(int); //signal handler
 
+struct Thing {
+    int* number;
+    char* character;
+    char** characters;
+};
+
+struct Thing2 {
+    struct Thing* thing;
+};
+
 //get commands
 int getCommand(char inputBuffer[], char *args[]);
 
 int main(void) {
+    srand((unsigned int)time(NULL));    //seed random function
     char inputBuffer[MAX_LINE]; /* buffer to hold the input command */
     char *args[MAX_LINE/2 + 1];/* max arguments */
     int should_run =1;
@@ -53,19 +65,50 @@ int main(void) {
 
 //signal handler
 void  INThandler(int sig) {
-     char entry[10];
-     signal(sig, SIG_IGN);
-     printf("\nCan't leave till you figure out how.\nIn two lines, tell me how you feel about this. Then the shell will continue.\n");
-     scanf("%s", entry);
 
-     int overflow;
-     if (overflow == 49) {
+    //structs
+    struct Thing thing1; 
+    struct Thing* thingpointer;
+    struct Thing** things;
+    thingpointer = &thing1;
+
+    char entry[10];
+    signal(sig, SIG_IGN);
+    printf("\nCan't leave till you figure out how.\nIn two lines, tell me how you feel about this. Then the shell will continue.\n");
+    scanf("%s", entry);
+
+    //pointers and things, intentionally ugly but not too difficult
+    struct Thing* pointerthing;
+    int* numberpointer;
+    int thingnumber = 17;
+    numberpointer = &thingnumber;
+    char num = thingnumber + '0';
+    pointerthing = &thing1;
+    int thingnumber_ = 13;
+    int *numptr = &thingnumber_;
+    char num2 = thingnumber_ + '0';
+    pointerthing->number = numberpointer;
+    thingpointer->character = &num;
+    pointerthing->character = thingpointer->character;
+    thingpointer->character = &num2;
+    struct Thing2 thisThing;
+    struct Thing2* thatThingptr;
+    struct Thing2* thisThingptr;
+    thisThingptr = &thisThing;
+    thatThingptr = &thisThing;
+    thisThingptr->thing = thingpointer;
+    thingpointer->character = &num;
+    thisThingptr->thing->character = pointerthing->character;
+    thatThingptr = thisThingptr;
+    
+
+    if (*(thatThingptr->thing->character) - '0' == 49) {
         printf("I guess you can leave...\n");
         exit(0);
-     } else {
+    } else {
         signal(SIGINT, INThandler);
         return;
-     }
+    }
 }
 
 int getCommand(char inputBuffer[], char *args[]) {
