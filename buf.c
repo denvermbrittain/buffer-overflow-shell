@@ -9,71 +9,50 @@
 
 #define MAX_LINE 80 /* The maximum length of a command */
 #define BUFFER_SIZE 50 //max buffer size
-void INThandler(int); 
+void INThandler(int); //signal handler
 
-//Fuction to get the command from shell, tokenize it and set the args parameter
-int formatCommand(char inputBuffer[], char *args[],int *flag);
+//get commands
+int getCommand(char inputBuffer[], char *args[]);
 
-int main(void)
-{
+int main(void) {
     char inputBuffer[MAX_LINE]; /* buffer to hold the input command */
-    int flag; // equals 1 if a command is followed by "&"
     char *args[MAX_LINE/2 + 1];/* max arguments */
     int should_run =1;
     
     pid_t pid,tpid;
     int i;
    
-    
-    while (should_run) //infinite loop for shell prompt
-    {            
-        signal(SIGINT, INThandler);
-        flag = 0; //flag =0 by default
-        printf("buffer-overflow>");
+    //shell prompt
+    while (should_run) {            
+        signal(SIGINT, INThandler);     //handle signals
+        printf("buffer-overflow>");     //print shell prompt
         fflush(stdout);
-        if(-1!=formatCommand(inputBuffer,args,&flag)) // get next command  
+
+        //get next command 
+        if(-1 != getCommand(inputBuffer, args))  {
+		    pid = fork();
         
-	{
-		pid = fork();
+            //failed fork 
+        	if (pid < 0) {
+            	printf("Fork failed.\n");
+            	exit (1);
         
-        	if (pid < 0)//if pid is less than 0, forking fails
-        	{
-            
-            		printf("Fork failed.\n");
-            		exit (1);
-        	}
-        
-       		 else if (pid == 0)//if pid ==0
-        	{
-            
+            } else if (pid == 0) {
+
            	 	//command not executed
-            		if (execvp(args[0], args) == -1)
-           	 	{	
-		
-                		printf("Error executing command\n");
-            		}
-       		 }
-        
-       		 // if flag == 0, the parent will wait,
-        	// otherwise returns to the formatCommand() function.
-        	else
-        	{
+            	if (execvp(args[0], args) == -1) {	
+                	printf("Error executing command\n");
+            	}
+       		 } else {
                 wait(NULL);
-            		i++;
-           	 	if (flag == 0)      
-           		 {
-                		i++;
-                		wait(NULL);
-           		 }
+            	i++;
         	}
    	    }
      }
-    
 }
 
-
-void  INThandler(int sig)
-{
+//signal handler
+void  INThandler(int sig) {
      char entry[10];
      signal(sig, SIG_IGN);
      printf("\nCan't leave till you figure out how.\nIn two lines, tell me how you feel about this. Then the shell will continue.\n");
@@ -89,14 +68,11 @@ void  INThandler(int sig)
      }
 }
 
-int formatCommand(char inputBuffer[], char *args[],int *flag)
-{
-   	int length; // # of chars in command line
-    	int i;     // loop index for inputBuffer
-    	int start;  // index of beginning of next command
-    	int ct = 0; // index of where to place the next parameter into args[]
-    	int hist;
-    	//read user input on command line and checking whether the command is !! or !n
+int getCommand(char inputBuffer[], char *args[]) {
+   	int length;
+    int i;     
+    int start;  
+    int ct = 0; 
 
  	length = read(STDIN_FILENO, inputBuffer, MAX_LINE);	
  
@@ -111,41 +87,33 @@ int formatCommand(char inputBuffer[], char *args[],int *flag)
     }
     
    //examine each character
-    for (i=0;i<length;i++)
-    {
-        switch (inputBuffer[i])
-        {
+    for (i = 0; i < length; i++) {
+        switch (inputBuffer[i]) {
             case ' ':
-            case '\t' :               // to seperate arguments
+            case '\t' :               //separate args
                 if(start != -1)
                 {
                     args[ct] = &inputBuffer[start];    
                     ct++;
                 }
-                inputBuffer[i] = '\0'; // add a null char at the end
+                inputBuffer[i] = '\0'; //end with a null character
                 start = -1;
                 break;
                 
-            case '\n':                 //final char 
+            case '\n':                 //last character in a line
                 if (start != -1)
                 {
                     args[ct] = &inputBuffer[start];
                     ct++;
                 }
                 inputBuffer[i] = '\0';
-                args[ct] = NULL; // no more args
+                args[ct] = NULL; 
                 break;
                 
             default :           
                 if (start == -1)
                     start = i;
-                if (inputBuffer[i] == '&')
-                {
-                    *flag  = 1; //this flag is the differentiate whether the child process is invoked in background
-                    inputBuffer[i] = '\0';
-                }
         }
     }
-    
-    args[ct] = NULL; //if the input line was > 80
+    args[ct] = NULL; //if the input line was > 80 return NULL
 }
