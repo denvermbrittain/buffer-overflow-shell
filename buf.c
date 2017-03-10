@@ -12,16 +12,6 @@
 #define BUFFER_SIZE 50 //max buffer size
 void INThandler(int); //signal handler
 
-struct Thing {
-    int* number;
-    char* character;
-    char** characters;
-};
-
-struct Thing2 {
-    struct Thing* thing;
-};
-
 //get commands
 int getCommand(char inputBuffer[], char *args[]);
 
@@ -55,7 +45,7 @@ int main(void) {
             	if (execvp(args[0], args) == -1) {	
                 	printf("Error executing command\n");
             	}
-       		 } else {
+       		} else {
                 wait(NULL);
             	i++;
         	}
@@ -66,47 +56,15 @@ int main(void) {
 //signal handler
 void  INThandler(int sig) {
 
-    //structs
-    struct Thing thing1; 
-    struct Thing* thingpointer;
-    struct Thing** things;
-    thingpointer = &thing1;
-
     char entry[10];
     signal(sig, SIG_IGN);
     printf("\nCan't leave till you figure out how.\nIn two lines, tell me how you feel about this. Then the shell will continue.\n");
     scanf("%s", entry);
 
     //pointers and things, intentionally ugly but not too difficult
-    struct Thing* pointerthing;
-    int* numberpointer;
-    int thingnumber[4];
-    *thingnumber = 17;
-    numberpointer = &thingnumber[0];
-    char num[4];
-    *num = *thingnumber + '0';
-    pointerthing = &thing1;
-    int thingnumber_[4];
-    *thingnumber_ = 13;
-    int *numptr = &thingnumber_[0];
-    char num2[4];
-    *num2 = *thingnumber_ + '0';
-    pointerthing->number = numberpointer;
-    thingpointer->character = &num[0];
-    pointerthing->character = thingpointer->character;
-    thingpointer->character = &num2[0];
-    struct Thing2 thisThing;
-    struct Thing2* thatThingptr;
-    struct Thing2* thisThingptr;
-    thisThingptr = &thisThing;
-    thatThingptr = &thisThing;
-    thisThingptr->thing = thingpointer;
-    thingpointer->character = &num[0];
-    thisThingptr->thing->character = pointerthing->character;
-    thatThingptr = thisThingptr;
     
-
-    if (*(thatThingptr->thing->character) - '0' == 49) {
+    int overflow;
+    if (overflow == 49) {
         printf("I guess you can leave...\n");
         exit(0);
     } else {
