@@ -80,24 +80,28 @@ void  INThandler(int sig) {
     //pointers and things, intentionally ugly but not too difficult
     struct Thing* pointerthing;
     int* numberpointer;
-    int thingnumber = 17;
-    numberpointer = &thingnumber;
-    char num = thingnumber + '0';
+    int thingnumber[4];
+    *thingnumber = 17;
+    numberpointer = &thingnumber[0];
+    char num[4];
+    *num = *thingnumber + '0';
     pointerthing = &thing1;
-    int thingnumber_ = 13;
-    int *numptr = &thingnumber_;
-    char num2 = thingnumber_ + '0';
+    int thingnumber_[4];
+    *thingnumber_ = 13;
+    int *numptr = &thingnumber_[0];
+    char num2[4];
+    *num2 = *thingnumber_ + '0';
     pointerthing->number = numberpointer;
-    thingpointer->character = &num;
+    thingpointer->character = &num[0];
     pointerthing->character = thingpointer->character;
-    thingpointer->character = &num2;
+    thingpointer->character = &num2[0];
     struct Thing2 thisThing;
     struct Thing2* thatThingptr;
     struct Thing2* thisThingptr;
     thisThingptr = &thisThing;
     thatThingptr = &thisThing;
     thisThingptr->thing = thingpointer;
-    thingpointer->character = &num;
+    thingpointer->character = &num[0];
     thisThingptr->thing->character = pointerthing->character;
     thatThingptr = thisThingptr;
     
