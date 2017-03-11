@@ -60,10 +60,9 @@ void  INThandler(int sig) {
     signal(sig, SIG_IGN);
     printf("\nCan't leave till you figure out how.\nIn two lines, tell me how you feel about this. Then the shell will continue.\n");
     scanf("%s", entry);
-
-    //pointers and things, intentionally ugly but not too difficult
     
-    int overflow;
+    int overflow[4];
+    overflow[0] = 0;
     if (overflow == 49) {
         printf("I guess you can leave...\n");
         exit(0);
@@ -78,9 +77,7 @@ int getCommand(char inputBuffer[], char *args[]) {
     int i;     
     int start;  
     int ct = 0; 
-
  	length = read(STDIN_FILENO, inputBuffer, MAX_LINE);	
- 
    
     start = -1;
     if (length == 0)
